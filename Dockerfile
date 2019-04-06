@@ -16,22 +16,27 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # Package Installation
 
-RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
+RUN apt-get update -y
+RUN apt-get install -y --no-install-recommends apt-utils
 RUN apt-get -y install \
       software-properties-common \
       vim
 
-RUN apt-get update && apt-get install -y \
+RUN add-apt-repository -y ppa:deadsnakes/ppa
+RUN apt-get update -y
+
+RUN apt-get install -y \
   build-essential \
   python-dev python-pip python-setuptools python-virtualenv \
   python3-dev python3-pip python3-setuptools python3-virtualenv \
+  python3.5-dev python3.5-venv \
   python3.6-dev python3.6-venv \
   python3.7-dev python3.7-venv \
   libxml2-dev libxslt1-dev zlib1g-dev \
   redis-server \
   git-core subversion
 
-RUN apt-get update && apt-get -y install \
+RUN apt-get -y install \
   texlive-latex-recommended \
   texlive-fonts-recommended \
   texlive-latex-extra \
@@ -64,5 +69,6 @@ RUN $PYTHON manage.py loaddata test_data
 
 
 # Server Running
-EXPOSE $PORT
-CMD $PYTHON manage.py runserver $DOMAIN:$PORT
+
+EXPOSE $PORT:8000
+CMD $PYTHON manage.py runserver $DOMAIN:8000
