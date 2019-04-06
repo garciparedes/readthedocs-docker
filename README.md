@@ -31,5 +31,9 @@ docker build -t garciparedes/readthedocs .
 docker logs readthedocs
 ```
 
+```bash
+docker exec -it readthedocs bash
+```
+
 ## Contributors
 * [Sergio García Prado](https://garciparedes.me)

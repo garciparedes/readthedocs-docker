@@ -27,7 +27,6 @@ RUN apt-get update -y
 
 RUN apt-get install -y \
   build-essential \
-  python-dev python-pip python-setuptools python-virtualenv \
   python3-dev python3-pip python3-setuptools python3-virtualenv \
   python3.5-dev python3.5-venv \
   python3.6-dev python3.6-venv \
