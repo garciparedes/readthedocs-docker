@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM python:3.6
 
 # Environment Variables
 
@@ -22,18 +22,14 @@ RUN apt-get -y install \
       software-properties-common \
       vim
 
-RUN add-apt-repository -y ppa:deadsnakes/ppa
-RUN apt-get update -y
-
 RUN apt-get install -y \
   build-essential \
-  python3-dev python3-pip python3-setuptools python3-virtualenv \
-  python3.5-dev python3.5-venv \
-  python3.6-dev python3.6-venv \
-  python3.7-dev python3.7-venv \
-  libxml2-dev libxslt1-dev zlib1g-dev \
+  libxml2-dev \
+  libxslt1-dev \
+  zlib1g-dev \
   redis-server \
-  git-core subversion
+  git-core \
+  subversion
 
 RUN apt-get -y install \
   texlive-latex-recommended \

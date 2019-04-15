@@ -7,7 +7,7 @@
 [TODO]
 
 ```bash
-docker run -d -it --name -p 8000:8000 readthedocs garciparedes/readthedocs
+docker run -d -it -p 8000:8000 --name readthedocs garciparedes/readthedocs
 ```
 
 ```bash
