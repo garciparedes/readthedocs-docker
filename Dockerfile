@@ -51,8 +51,8 @@ RUN alias svn="svn --username $SVN_USERNAME --password $SVN_PASSWORD"
 # Project Configuration
 
 RUN git clone --recurse-submodules https://github.com/rtfd/readthedocs.org.git
+COPY ./local_settings.py ./readthedocs.org/readthedocs/settings/local_settings.py
 RUN mkdir /www
-COPY ./local_settings.py ./readthedocs/settings/local_settings.py
 RUN mv ./readthedocs.org /www/readthedocs.org
 WORKDIR /www/readthedocs.org
 
