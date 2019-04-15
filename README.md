@@ -6,7 +6,7 @@ Dockerized readthedocs image.
 ## Usage
 
 ```bash
-docker run -d -it -p 8000:8000 --env "RTD_PRODUCTION_DOMAIN=0.0.0.0:8000" --name readthedocs garciparedes/readthedocs
+docker run -d -it -p 8000:8000 --env PRODUCTION_DOMAIN=0.0.0.0:8000 --name readthedocs garciparedes/readthedocs
 ```
 
 ```bash

@@ -82,7 +82,7 @@ ADD ./supervisord.conf /etc/supervisord.conf
 
 VOLUME /www/readthedocs.org
 
-ENV RTD_PRODUCTION_DOMAIN 'localhost:8000'
+ENV PRODUCTION_DOMAIN 'localhost:8000'
 
 COPY ./readthedocs.nginx.conf /etc/nginx/sites-available/readthedocs
 RUN ln -s /etc/nginx/sites-available/readthedocs /etc/nginx/sites-enabled/readthedocs
