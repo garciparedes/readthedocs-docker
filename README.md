@@ -1,10 +1,9 @@
 # readthedocs-docker
 
 ## Description
-[TODO]
+Dockerized readthedocs image.
 
 ## Usage
-[TODO]
 
 ```bash
 docker run -d -it -p 8000:8000 --name readthedocs garciparedes/readthedocs
