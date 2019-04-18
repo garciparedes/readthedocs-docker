@@ -1,15 +1,14 @@
 #!/bin/bash
-
-NAME="readthedocs"                                  # Name of the application
-DJANGODIR=/www/readthedocs.org                      # Django project directory
-SOCKFILE=/www/readthedocs.org/run/gunicorn.sock     # We will communicate using this unix socket
+PROJECT_NAME='readthedocs'
+DJANGODIR=/www/${PROJECT_NAME}                      # Django project directory
+SOCKFILE=/www/${PROJECT_NAME}/run/gunicorn.sock     # We will communicate using this unix socket
 USER=root                                           # The user to run as
 GROUP=root                                          # The group to run as
 NUM_WORKERS=3                                       # How many worker processes should Gunicorn spawn
-DJANGO_SETTINGS_MODULE=readthedocs.settings.dev  # Which settings file should Django use
-DJANGO_WSGI_MODULE=readthedocs.wsgi                 # WSGI module name
+DJANGO_SETTINGS_MODULE=${PROJECT_NAME}.settings.dev # Which settings file should Django use
+DJANGO_WSGI_MODULE=${PROJECT_NAME}.wsgi             # WSGI module name
 
-echo "Starting $NAME as `whoami`"
+echo "Starting ${PROJECT_NAME} as `whoami`"
 
 # Activate the virtual environment
 cd $DJANGODIR
@@ -24,7 +23,7 @@ test -d $RUNDIR || mkdir -p $RUNDIR
 # Start your Django Unicorn
 # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
 exec gunicorn ${DJANGO_WSGI_MODULE}:application \
-  --name $NAME \
+  --name ${PROJECT_NAME} \
   --workers $NUM_WORKERS \
   --user=$USER \
   --group=$GROUP \
