@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM ubuntu:18.04
 
 # Environment Variables
 
@@ -21,7 +21,13 @@ RUN apt-get -y install \
       software-properties-common \
       vim
 
+RUN add-apt-repository ppa:deadsnakes/ppa -y
+
 RUN apt-get install -y \
+  python3-dev python3-pip python3-setuptools python3-virtualenv \
+  python3.5-dev python3.5-venv \
+  python3.6-dev python3.6-venv \
+  python3.7-dev python3.7-venv \
   build-essential \
   libxml2-dev \
   libxslt1-dev \
@@ -65,6 +71,9 @@ RUN echo \
 RUN $PYTHON manage.py collectstatic --noinput
 RUN $PYTHON manage.py loaddata test_data
 
+# Setting Up environment.
+
+# COPY ./ssh-keys/* ~/.ssh/
 
 # Server Running
 
