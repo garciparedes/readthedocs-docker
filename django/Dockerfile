@@ -11,7 +11,13 @@ ARG ADMIN_PASSWORD
 ENV PORT=8000 \
     DOMAIN=0.0.0.0 \
     DEBIAN_FRONTEND=noninteractive \
-    PYTHON=python3.6
+    PYTHON=python3.6 \
+    PYTHON_VERSION_27=2.7.15 \
+    PYTHON_VERSION_35=3.5.7 \
+    PYTHON_VERSION_36=3.6.8 \
+    PYTHON_VERSION_37=3.7.3 \
+    PRODUCTION_DOMAIN=${DOMAIN}:${PORT}
+
 
 # Package Installation
 
@@ -21,20 +27,15 @@ RUN apt-get -y install \
       software-properties-common \
       vim
 
-RUN add-apt-repository ppa:deadsnakes/ppa -y
-
 RUN apt-get install -y \
-  python3-dev python3-pip python3-setuptools python3-virtualenv \
-  python3.5-dev python3.5-venv \
-  python3.6-dev python3.6-venv \
-  python3.7-dev python3.7-venv \
   build-essential \
   libxml2-dev \
   libxslt1-dev \
   zlib1g-dev \
   redis-server \
   git-core \
-  subversion
+  subversion \
+  nginx
 
 RUN apt-get -y install \
   texlive-latex-recommended \
@@ -44,12 +45,50 @@ RUN apt-get -y install \
   dvipng \
   graphviz
 
-RUN apt-get -y install \
-  nginx
+RUN apt-get install -y \
+  gcc \
+  make \
+  libssl-dev \
+  zlib1g-dev \
+  libbz2-dev \
+  libreadline-dev \
+  libsqlite3-dev \
+  wget \
+  curl \
+  llvm \
+  libncurses5-dev \
+  libncursesw5-dev \
+  xz-utils \
+  tk-dev \
+  libffi-dev \
+  liblzma-dev \
+  python-openssl
+
+RUN curl https://pyenv.run | bash
+ENV PYENV_ROOT /root/.pyenv
+ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
+RUN eval "$(pyenv init -)"
+RUN eval "$(pyenv virtualenv-init -)"
+
+RUN pyenv install $PYTHON_VERSION_27 && \
+    pyenv install $PYTHON_VERSION_35 && \
+    pyenv install $PYTHON_VERSION_36 && \
+    pyenv install $PYTHON_VERSION_37 && \
+    pyenv global \
+        $PYTHON_VERSION_27 \
+        $PYTHON_VERSION_35 \
+        $PYTHON_VERSION_36 \
+        $PYTHON_VERSION_37
+
 
 RUN apt-get upgrade -y
+RUN apt-get autoremove -y
 
-# Project Configuration
+# Setting Up environment.
+
+# COPY ./ssh-keys/* ~/.ssh/
+
+# Setting Up Project
 
 RUN git clone --recurse-submodules https://github.com/rtfd/readthedocs.org.git
 COPY ./local_settings.py ./readthedocs.org/readthedocs/settings/local_settings.py
@@ -60,35 +99,15 @@ WORKDIR /www/readthedocs
 
 RUN git checkout tags/3.4.1
 
-RUN $PYTHON -m pip install -r requirements.txt
-RUN $PYTHON manage.py migrate
-
-RUN echo \
-  "from django.contrib.auth.models import User; \
-  User.objects.create_superuser('$ADMIN_USERNAME', '$ADMIN_EMAIL', '$ADMIN_PASSWORD')" | \
-  $PYTHON ./manage.py shell
-
-RUN $PYTHON manage.py collectstatic --noinput
-RUN $PYTHON manage.py loaddata test_data
-
-# Setting Up environment.
-
-# COPY ./ssh-keys/* ~/.ssh/
-
-# Server Running
-
-RUN pip install gunicorn
-RUN pip install setproctitle
+# Setting Up Server
 
 COPY ./gunicorn_start.sh ./gunicorn_start.sh
 RUN chmod u+x ./gunicorn_start.sh
 
-RUN pip install supervisor
 ADD ./supervisord.conf /etc/supervisord.conf
-
-ENV PRODUCTION_DOMAIN=${DOMAIN}:${PORT}
 
 COPY ./readthedocs.nginx.conf /etc/nginx/sites-available/readthedocs
 RUN ln -s /etc/nginx/sites-available/readthedocs /etc/nginx/sites-enabled/readthedocs
 
-RUN apt-get autoremove -y
+
+COPY ./deploy.sh ./deploy.sh
