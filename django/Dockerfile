@@ -70,23 +70,24 @@ ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN eval "$(pyenv init -)"
 RUN eval "$(pyenv virtualenv-init -)"
 
-RUN pyenv install $PYTHON_VERSION_27 && \
-    pyenv install $PYTHON_VERSION_35 && \
-    pyenv install $PYTHON_VERSION_36 && \
+RUN pyenv install $PYTHON_VERSION_36 && \
     pyenv install $PYTHON_VERSION_37 && \
-    pyenv global \
-        $PYTHON_VERSION_27 \
-        $PYTHON_VERSION_35 \
-        $PYTHON_VERSION_36 \
-        $PYTHON_VERSION_37
-
+    pyenv install $PYTHON_VERSION_35 && \
+    pyenv install $PYTHON_VERSION_27
+RUN pyenv global \
+    $PYTHON_VERSION_36 \
+    $PYTHON_VERSION_37 \
+    $PYTHON_VERSION_35 \
+    $PYTHON_VERSION_27 \
 
 RUN apt-get upgrade -y
 RUN apt-get autoremove -y
 
+
 # Setting Up environment.
 
 # COPY ./ssh-keys/* ~/.ssh/
+
 
 # Setting Up Project
 
@@ -99,6 +100,7 @@ WORKDIR /www/readthedocs
 
 RUN git checkout tags/3.4.1
 
+
 # Setting Up Server
 
 COPY ./gunicorn_start.sh ./gunicorn_start.sh
@@ -110,4 +112,19 @@ COPY ./readthedocs.nginx.conf /etc/nginx/sites-available/readthedocs
 RUN ln -s /etc/nginx/sites-available/readthedocs /etc/nginx/sites-enabled/readthedocs
 
 
-COPY ./deploy.sh ./deploy.sh
+# Setting Up Project
+
+RUN $PYTHON -m pip install \
+  gunicorn \
+  setproctitle \
+  supervisor
+
+RUN $PYTHON -m pip install -r requirements.txt
+RUN $PYTHON manage.py migrate
+
+RUN echo "from django.contrib.auth.models import User; \
+  User.objects.create_superuser('$ADMIN_USERNAME', '$ADMIN_EMAIL', '$ADMIN_PASSWORD')" | \
+  $PYTHON ./manage.py shell;
+
+RUN $PYTHON manage.py collectstatic --noinput
+RUN $PYTHON manage.py loaddata test_data

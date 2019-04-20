@@ -12,7 +12,7 @@ services:
         ADMIN_EMAIL: ${ADMIN_EMAIL}
         ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     container_name: ${PROJECT_NAME}_django
-    command: bash deploy.sh
+    command: supervisord
     ports:
       - "8000:8000"
     depends_on:
