@@ -17,6 +17,7 @@ services:
       - "8000:8000"
     depends_on:
       - mysql
+      - elasticsearch
 
   mysql:
     image: mysql:5.6
@@ -31,6 +32,15 @@ services:
       - MYSQL_PASSWORD=dbpw
     ports:
       - "8306:3306"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+    container_name: ${PROJECT_NAME}_elasticsearch
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
 
 volumes:
   db:

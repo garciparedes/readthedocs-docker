@@ -53,7 +53,7 @@ class CommunityDockerSettings(CommunityBaseSettings):
     )
 
     # Disable auto syncing elasticsearch documents in development
-    ELASTICSEARCH_DSL_AUTOSYNC = False
+    ELASTICSEARCH_DSL_AUTOSYNC = True
 
     @property
     def LOGGING(self):  # noqa - avoid pep8 N802
