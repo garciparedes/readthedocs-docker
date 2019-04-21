@@ -64,11 +64,21 @@ RUN apt-get install -y \
   liblzma-dev \
   python-openssl
 
+RUN apt-get upgrade -y
+RUN apt-get autoremove -y
+
+
+# Setting Up Python.
+
+## Installing pyenv
+
 RUN curl https://pyenv.run | bash
 ENV PYENV_ROOT /root/.pyenv
 ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN eval "$(pyenv init -)"
 RUN eval "$(pyenv virtualenv-init -)"
+
+## Installing Python versions
 
 RUN pyenv install $PYTHON_VERSION_36 && \
     pyenv install $PYTHON_VERSION_37 && \
@@ -80,8 +90,9 @@ RUN pyenv global \
     $PYTHON_VERSION_35 \
     $PYTHON_VERSION_27
 
-RUN apt-get upgrade -y
-RUN apt-get autoremove -y
+## Installing missing packages
+
+RUN python3.5 -m pip install virtualenv
 
 
 # Setting Up environment.
