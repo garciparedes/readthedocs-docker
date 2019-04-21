@@ -15,8 +15,8 @@ ENV PORT=8000 \
     PYTHON_VERSION_27=2.7.15 \
     PYTHON_VERSION_35=3.5.7 \
     PYTHON_VERSION_36=3.6.8 \
-    PYTHON_VERSION_37=3.7.3 \
-    PRODUCTION_DOMAIN=${DOMAIN}:${PORT}
+    PYTHON_VERSION_37=3.7.3
+ENV PRODUCTION_DOMAIN=${DOMAIN}:${PORT}
 
 
 # Package Installation
@@ -120,7 +120,7 @@ ADD ./supervisord.conf /etc/supervisord.conf
 COPY ./readthedocs.nginx.conf /etc/nginx/sites-available/readthedocs
 RUN ln -s /etc/nginx/sites-available/readthedocs /etc/nginx/sites-enabled/readthedocs
 
-RUN python -m pip install \
+RUN pip install \
   gunicorn \
   setproctitle \
   supervisor
