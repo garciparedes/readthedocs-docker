@@ -78,7 +78,7 @@ RUN pyenv global \
     $PYTHON_VERSION_36 \
     $PYTHON_VERSION_37 \
     $PYTHON_VERSION_35 \
-    $PYTHON_VERSION_27 \
+    $PYTHON_VERSION_27
 
 RUN apt-get upgrade -y
 RUN apt-get autoremove -y
@@ -100,6 +100,15 @@ WORKDIR /www/readthedocs
 
 RUN git checkout tags/3.4.1
 
+RUN $PYTHON -m pip install -r requirements.txt
+RUN $PYTHON manage.py migrate
+
+RUN echo "from django.contrib.auth.models import User; \
+  User.objects.create_superuser('$ADMIN_USERNAME', '$ADMIN_EMAIL', '$ADMIN_PASSWORD')" | \
+  $PYTHON ./manage.py shell;
+
+RUN $PYTHON manage.py collectstatic --noinput
+RUN $PYTHON manage.py loaddata test_data
 
 # Setting Up Server
 
@@ -111,20 +120,7 @@ ADD ./supervisord.conf /etc/supervisord.conf
 COPY ./readthedocs.nginx.conf /etc/nginx/sites-available/readthedocs
 RUN ln -s /etc/nginx/sites-available/readthedocs /etc/nginx/sites-enabled/readthedocs
 
-
-# Setting Up Project
-
-RUN $PYTHON -m pip install \
+RUN python -m pip install \
   gunicorn \
   setproctitle \
   supervisor
-
-RUN $PYTHON -m pip install -r requirements.txt
-RUN $PYTHON manage.py migrate
-
-RUN echo "from django.contrib.auth.models import User; \
-  User.objects.create_superuser('$ADMIN_USERNAME', '$ADMIN_EMAIL', '$ADMIN_PASSWORD')" | \
-  $PYTHON ./manage.py shell;
-
-RUN $PYTHON manage.py collectstatic --noinput
-RUN $PYTHON manage.py loaddata test_data
