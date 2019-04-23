@@ -1,0 +1,3 @@
+[submodule "readthedocs"]
+	path = readthedocs
+	url = git@github.com:garciparedes/readthedocs.org.git

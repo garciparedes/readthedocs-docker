@@ -1,12 +1,12 @@
 #!/bin/bash
 PROJECT_NAME='readthedocs'
-DJANGODIR=/www/${PROJECT_NAME}                      # Django project directory
-SOCKFILE=/www/${PROJECT_NAME}/run/gunicorn.sock     # We will communicate using this unix socket
-USER=root                                           # The user to run as
-GROUP=root                                          # The group to run as
-NUM_WORKERS=3                                       # How many worker processes should Gunicorn spawn
-DJANGO_SETTINGS_MODULE=${PROJECT_NAME}.settings.dev # Which settings file should Django use
-DJANGO_WSGI_MODULE=${PROJECT_NAME}.wsgi             # WSGI module name
+DJANGODIR=/www/${PROJECT_NAME}                         # Django project directory
+SOCKFILE=/www/${PROJECT_NAME}/run/gunicorn.sock        # We will communicate using this unix socket
+USER=root                                              # The user to run as
+GROUP=root                                             # The group to run as
+NUM_WORKERS=3                                          # How many worker processes should Gunicorn spawn
+DJANGO_SETTINGS_MODULE=${PROJECT_NAME}.settings.docker # Which settings file should Django use
+DJANGO_WSGI_MODULE=${PROJECT_NAME}.wsgi                # WSGI module name
 
 echo "Starting ${PROJECT_NAME} as `whoami`"
 

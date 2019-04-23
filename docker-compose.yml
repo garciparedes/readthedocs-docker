@@ -1,10 +1,10 @@
 version: "3.1"
-
 services:
 
   django:
     build:
-      context: ./django
+      context: .
+      dockerfile: ./docker/django/Dockerfile
       args:
         SVN_USERNAME: ${SVN_USERNAME}
         SVN_PASSWORD: ${SVN_PASSWORD}

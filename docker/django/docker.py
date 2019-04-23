@@ -15,16 +15,20 @@ class CommunityDockerSettings(CommunityBaseSettings):
     @property
     def DATABASES(self):  # noqa
         return {
+            # 'default': {
+            #     'ENGINE': 'django.db.backends.mysql',
+            #     'NAME': 'db',
+            #     'USER': 'root',
+            #     'PASSWORD': 'docker_root',
+            #     'HOST': 'mysql',
+            #     'PORT': '3306',
+            #     'TEST': {
+            #         'NAME': 'db_test',
+            #     },
+            # }
             'default': {
-                'ENGINE': 'django.db.backends.mysql',
-                'NAME': 'db',
-                'USER': 'dbuser',
-                'PASSWORD': 'dbpw',
-                'HOST': 'mysql',
-                'PORT': '3306',
-                'TEST': {
-                    'NAME': 'db_test',
-                },
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': os.path.join(self.SITE_ROOT, 'dev.db'),
             }
         }
 
