@@ -108,8 +108,6 @@ COPY ./readthedocs/ /www/readthedocs
 WORKDIR /www/readthedocs
 
 COPY ./docker/django/local_settings.py ./readthedocs/settings/local_settings.py
-COPY ./docker/django/docker.py ./readthedocs/settings/docker.py
-
 
 RUN $PYTHON -m pip install -r requirements.txt
 RUN $PYTHON -m pip install mysqlclient
