@@ -2,72 +2,74 @@ FROM ubuntu:18.04
 
 # Environment Variables
 
+ARG PORT
+ARG DOMAIN
+
 ARG SVN_USERNAME
 ARG SVN_PASSWORD
+
 ARG ADMIN_USERNAME
 ARG ADMIN_EMAIL
 ARG ADMIN_PASSWORD
-ENV PORT=8000 \
-    DOMAIN=0.0.0.0 \
-    DEBIAN_FRONTEND=noninteractive \
-    PYTHON=python3.6 \
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+ENV PYTHON=python3.6 \
     PYTHON_VERSION_27=2.7.15 \
     PYTHON_VERSION_35=3.5.7 \
     PYTHON_VERSION_36=3.6.8 \
     PYTHON_VERSION_37=3.7.3
+
 ENV PRODUCTION_DOMAIN=${DOMAIN}:${PORT}
 
 
 # Package Installation
 
-RUN apt-get update -y
-RUN apt-get install -y --no-install-recommends apt-utils
-RUN apt-get -y install \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      apt-utils
+
+RUN apt-get update && apt-get -y install \
       software-properties-common \
       vim
 
-RUN apt-get install -y \
-  build-essential \
-  libxml2-dev \
-  libxslt1-dev \
-  zlib1g-dev \
-  redis-server \
-  git-core \
-  subversion \
-  nginx \
-  libmysqlclient-dev
+RUN apt-get update && apt-get -y install \
+      build-essential \
+      libxml2-dev \
+      libxslt1-dev \
+      zlib1g-dev \
+      redis-server \
+      git-core \
+      subversion \
+      nginx \
+      libmysqlclient-dev
 
-RUN apt-get -y install \
-  texlive-latex-recommended \
-  texlive-fonts-recommended \
-  texlive-latex-extra \
-  doxygen \
-  dvipng \
-  graphviz
+RUN apt-get update && apt-get -y install \
+      texlive-latex-recommended \
+      texlive-fonts-recommended \
+      texlive-latex-extra \
+      doxygen \
+      dvipng \
+      graphviz
 
-RUN apt-get install -y \
-  gcc \
-  make \
-  libssl-dev \
-  libpq-dev \
-  zlib1g-dev \
-  libbz2-dev \
-  libreadline-dev \
-  libsqlite3-dev \
-  wget \
-  curl \
-  llvm \
-  libncurses5-dev \
-  libncursesw5-dev \
-  xz-utils \
-  tk-dev \
-  libffi-dev \
-  liblzma-dev \
-  python-openssl
-
-RUN apt-get upgrade -y
-RUN apt-get autoremove -y
-
+RUN apt-get update && apt-get -y install \
+      gcc \
+      make \
+      libssl-dev \
+      libpq-dev \
+      zlib1g-dev \
+      libbz2-dev \
+      libreadline-dev \
+      libsqlite3-dev \
+      wget \
+      curl \
+      llvm \
+      libncurses5-dev \
+      libncursesw5-dev \
+      xz-utils \
+      tk-dev \
+      libffi-dev \
+      liblzma-dev \
+      python-openssl
 
 # Setting Up Python.
 
@@ -95,6 +97,10 @@ RUN pyenv global \
 
 RUN python3.5 -m pip install virtualenv
 
+RUN pip install \
+  gunicorn \
+  setproctitle \
+  supervisor
 
 # Setting Up environment.
 
@@ -106,8 +112,6 @@ RUN python3.5 -m pip install virtualenv
 RUN mkdir /www
 COPY ./readthedocs/ /www/readthedocs
 WORKDIR /www/readthedocs
-
-COPY ./docker/django/local_settings.py ./readthedocs/settings/local_settings.py
 
 RUN $PYTHON -m pip install -r requirements.txt
 RUN $PYTHON -m pip install mysqlclient
@@ -129,8 +133,3 @@ COPY ./docker/django/supervisord.conf /etc/supervisord.conf
 
 COPY ./docker/django/readthedocs.nginx.conf /etc/nginx/sites-available/readthedocs
 RUN ln -s /etc/nginx/sites-available/readthedocs /etc/nginx/sites-enabled/readthedocs
-
-RUN pip install \
-  gunicorn \
-  setproctitle \
-  supervisor
