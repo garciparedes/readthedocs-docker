@@ -1,16 +1,10 @@
+################################################################################
+# Image Building Start
+################################################################################
+
 FROM ubuntu:18.04
 
-# Environment Variables
-
-ARG PORT
-ARG DOMAIN
-
-ARG SVN_USERNAME
-ARG SVN_PASSWORD
-
-ARG ADMIN_USERNAME
-ARG ADMIN_EMAIL
-ARG ADMIN_PASSWORD
+## Environment Image Variables
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -20,10 +14,7 @@ ENV PYTHON=python3.6 \
     PYTHON_VERSION_36=3.6.8 \
     PYTHON_VERSION_37=3.7.3
 
-ENV PRODUCTION_DOMAIN=${DOMAIN}:${PORT}
-
-
-# Package Installation
+## Package Installation
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
       apt-utils
@@ -71,9 +62,9 @@ RUN apt-get update && apt-get -y install \
       liblzma-dev \
       python-openssl
 
-# Setting Up Python.
+## Setting Up Python...
 
-## Installing pyenv
+### Installing pyenv...
 
 RUN curl https://pyenv.run | bash
 ENV PYENV_ROOT /root/.pyenv
@@ -81,7 +72,7 @@ ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN eval "$(pyenv init -)"
 RUN eval "$(pyenv virtualenv-init -)"
 
-## Installing Python versions
+### Installing Python versions
 
 RUN pyenv install $PYTHON_VERSION_36 && \
     pyenv install $PYTHON_VERSION_37 && \
@@ -93,7 +84,7 @@ RUN pyenv global \
     $PYTHON_VERSION_35 \
     $PYTHON_VERSION_27
 
-## Installing missing packages
+### Installing missing packages
 
 RUN python3.5 -m pip install virtualenv
 
@@ -102,27 +93,57 @@ RUN pip install \
   setproctitle \
   supervisor
 
-# Setting Up environment.
+################################################################################
+# Image Building End
+################################################################################
+
+
+################################################################################
+# Project Building Start
+################################################################################
 
 # COPY ./ssh-keys/* ~/.ssh/
 
 
 # Setting Up Project
 
-RUN mkdir /www
-COPY ./readthedocs/ /www/readthedocs
-WORKDIR /www/readthedocs
+RUN mkdir -p /www/readthedocs/
+WORKDIR /www/readthedocs/
+
+COPY ./readthedocs/requirements/ /www/readthedocs/requirements/
+COPY ./readthedocs/requirements.txt /www/readthedocs/requirements.txt
 
 RUN $PYTHON -m pip install -r requirements.txt
 RUN $PYTHON -m pip install mysqlclient
-RUN $PYTHON manage.py migrate
+RUN $PYTHON -m pip install django-mysql
 
-RUN echo "from django.contrib.auth.models import User; \
-  User.objects.create_superuser('$ADMIN_USERNAME', '$ADMIN_EMAIL', '$ADMIN_PASSWORD')" | \
-  $PYTHON ./manage.py shell;
+COPY ./readthedocs/ /www/readthedocs
 
-RUN $PYTHON manage.py collectstatic --noinput
-RUN $PYTHON manage.py loaddata test_data
+## Setting up environment variables.
+
+ARG PROJECT_NAME
+ARG PORT
+ARG DOMAIN
+ARG MYSQL_PASSWORD
+
+ARG SVN_USERNAME
+ARG SVN_PASSWORD
+
+ARG ADMIN_USERNAME
+ARG ADMIN_EMAIL
+ARG ADMIN_PASSWORD
+
+ENV PROJECT_NAME=${PROJECT_NAME} \
+    PORT=${PORT} \
+    DOMAIN=${DOMAIN} \
+    MYSQL_PASSWORD=${MYSQL_PASSWORD} \
+    SVN_USERNAME=${SVN_USERNAME} \
+    SVN_PASSWORD=${SVN_PASSWORD} \
+    ADMIN_USERNAME=${ADMIN_USERNAME} \
+    ADMIN_EMAIL=${ADMIN_EMAIL} \
+    ADMIN_PASSWORD=${ADMIN_PASSWORD}
+
+ENV PRODUCTION_DOMAIN=${DOMAIN}:${PORT}
 
 # Setting Up Server
 
@@ -133,3 +154,11 @@ COPY ./docker/django/supervisord.conf /etc/supervisord.conf
 
 COPY ./docker/django/readthedocs.nginx.conf /etc/nginx/sites-available/readthedocs
 RUN ln -s /etc/nginx/sites-available/readthedocs /etc/nginx/sites-enabled/readthedocs
+
+COPY ./docker/django/docker-entrypoint.sh ./docker-entrypoint.sh
+
+ENTRYPOINT ["./docker-entrypoint.sh"]
+
+################################################################################
+# Project Builiding End
+################################################################################
