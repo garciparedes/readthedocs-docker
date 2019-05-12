@@ -6,32 +6,21 @@ Dockerized readthedocs image.
 ## Usage
 
 ```bash
-docker run -d -it -p 8000:8000 --env PRODUCTION_DOMAIN="0.0.0.0:8000" --name readthedocs garciparedes/readthedocs
+docker-compose up --detach --build
 ```
 
 ```bash
-docker start readthedocs
-```
-
-```bash
-docker stop readthedocs
-```
-
-```bash
-docker rm --force readthedocs
+docker-compose down
 ```
 
 ## Development
+
 ```bash
-docker build -t garciparedes/readthedocs .
+docker-compose logs
 ```
 
 ```bash
-docker logs readthedocs
-```
-
-```bash
-docker exec -it readthedocs bash
+docker-compose exec django bash
 ```
 
 ## Contributors
