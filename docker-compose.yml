@@ -7,7 +7,6 @@ services:
       dockerfile: ./docker/django/Dockerfile
       args:
         PROJECT_NAME: ${PROJECT_NAME}
-        PORT: ${PORT}
         DOMAIN: ${DOMAIN}
         MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         SVN_USERNAME: ${SVN_USERNAME}
