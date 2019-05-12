@@ -16,7 +16,8 @@ services:
         ADMIN_EMAIL: ${ADMIN_EMAIL}
     container_name: ${PROJECT_NAME}_django
     volumes:
-      - docs:/www/readthedocs/public_web_root
+      - web_root:/www/readthedocs/public_web_root
+      - web_builds:/www/readthedocs/user_builds
     command: supervisord
     restart: always
     ports:
@@ -42,4 +43,5 @@ services:
 
 volumes:
   database:
-  docs:
+  web_root:
+  web_builds:
